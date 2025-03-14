@@ -1,0 +1,11 @@
+# pokemon service with a Postgres database that exposes the default port 5432
+
+services:
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: pokemon
+    ports:
+      - "5432:5432"
