@@ -9,5 +9,6 @@ fn main() -> Result<(), csv::Error> {
         let record: PokemonCsv = result?;
         println!("{:?}", record);
     }
+    dbg!(PokemonId::new());
     Ok(())
 }
