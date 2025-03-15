@@ -3,33 +3,34 @@ use std::fmt;
 
 use inflector::Inflector;
 use ksuid::Ksuid;
+use sqlx::PgPool;
 
 #[derive(Debug)]
 pub struct PokemonTableRow {
     pub id: PokemonId,
     pub name: String,
     pub slug: String,
-    pub pokedex_id: u16,
+    pub pokedex_id: i16,
     // abilities: Vec<String>,
     // typing: Vec<String>,
-    pub hp: u16,
-    pub attack: u16,
-    pub defense: u16,
-    pub special_attack: u16,
-    pub special_defense: u16,
-    pub speed: u16,
-    pub height: u16,
-    pub weight: u16,
-    pub generation: u16,
+    pub hp: i16,
+    pub attack: i16,
+    pub defense: i16,
+    pub special_attack: i16,
+    pub special_defense: i16,
+    pub speed: i16,
+    pub height: i16,
+    pub weight: i16,
+    pub generation: i16,
     pub female_rate: Option<f32>,
     pub genderless: bool,
     pub legendary_or_mythical: bool,
     pub is_default: bool,
     pub forms_switchable: bool,
-    pub base_experience: u16,
-    pub capture_rate: u16,
+    pub base_experience: i16,
+    pub capture_rate: i16,
     // egg_groups: Vec<String>,
-    pub base_happiness: u16,
+    pub base_happiness: i16,
     // evolves_from: Option<String>,
     pub primary_color: String,
     pub number_pokemon_with_typing: f32,
@@ -56,8 +57,13 @@ pub struct PokemonTableRow {
 pub struct PokemonId(Ksuid);
 
 impl PokemonId {
+    /// Creates a new [`PokemonId`].
     pub fn new() -> Self {
         PokemonId(Ksuid::generate())
+    }
+
+    pub fn into_bytes(&self) -> Vec<u8> {
+        self.0.to_base62().into_bytes()
     }
 }
 
@@ -69,28 +75,30 @@ impl fmt::Debug for PokemonId {
     }
 }
 
-impl From<PokemonCsv> for PokemonTableRow {
-    fn from(csv: PokemonCsv) -> Self {
-        PokemonTableRow {
+impl TryFrom<PokemonCsv> for PokemonTableRow {
+    type Error = ();
+
+    fn try_from(csv: PokemonCsv) -> Result<Self, Self::Error> {
+        Ok(PokemonTableRow {
             id: PokemonId::new(),
             slug: csv.name.to_kebab_case(),
             name: csv.name,
-            pokedex_id: csv.pokedex_id,
+            pokedex_id: csv.pokedex_id as i16,
             hp: csv.hp.into(),
             attack: csv.attack.into(),
             defense: csv.defense.into(),
             special_attack: csv.special_attack.into(),
             special_defense: csv.special_defense.into(),
             speed: csv.speed.into(),
-            height: csv.height,
-            weight: csv.weight,
+            height: csv.height as i16,
+            weight: csv.weight as i16,
             generation: csv.generation.into(),
             female_rate: csv.female_rate,
             genderless: csv.genderless,
             legendary_or_mythical: csv.is_legendary_or_mythical,
             is_default: csv.is_default,
             forms_switchable: csv.forms_switchable,
-            base_experience: csv.base_experience.into(),
+            base_experience: csv.base_experience as i16,
             capture_rate: csv.capture_rate.into(),
             base_happiness: csv.base_happiness.into(),
             primary_color: csv.primary_color,
@@ -113,6 +121,112 @@ impl From<PokemonCsv> for PokemonTableRow {
             dark_attack_effectiveness: csv.dark_attack_effectiveness,
             steel_attack_effectiveness: csv.steel_attack_effectiveness,
             fairy_attack_effectiveness: csv.fairy_attack_effectiveness,
-        }
+        })
     }
+}
+
+pub async fn insert_pokemon(
+    pool: &PgPool,
+    PokemonTableRow {
+        id,
+        slug,
+        name,
+        pokedex_id,
+        hp,
+        attack,
+        defense,
+        special_attack,
+        special_defense,
+        speed,
+        height,
+        weight,
+        generation,
+        female_rate,
+        genderless,
+        legendary_or_mythical,
+        is_default,
+        forms_switchable,
+        base_experience,
+        capture_rate,
+        base_happiness,
+        primary_color,
+        number_pokemon_with_typing,
+        normal_attack_effectiveness,
+        fire_attack_effectiveness,
+        water_attack_effectiveness,
+        electric_attack_effectiveness,
+        grass_attack_effectiveness,
+        ice_attack_effectiveness,
+        fighting_attack_effectiveness,
+        poison_attack_effectiveness,
+        ground_attack_effectiveness,
+        fly_attack_effectiveness,
+        psychic_attack_effectiveness,
+        bug_attack_effectiveness,
+        rock_attack_effectiveness,
+        ghost_attack_effectiveness,
+        dragon_attack_effectiveness,
+        dark_attack_effectiveness,
+        steel_attack_effectiveness,
+        fairy_attack_effectiveness,
+    }: &PokemonTableRow,
+) -> Result<sqlx::postgres::PgQueryResult, sqlx::Error> {
+    sqlx::query!(
+        r#"
+        insert into pokemon (id, slug, name, pokedex_id, hp, attack, defense, special_attack, special_defense, speed,
+                                    height, weight, generation, female_rate, genderless, legendary_or_mythical, is_default,
+                                    forms_switchable, base_experience, capture_rate, base_happiness, primary_color,
+                                    number_pokemon_with_typing, normal_attack_effectiveness, fire_attack_effectiveness,
+                                    water_attack_effectiveness, electric_attack_effectiveness, grass_attack_effectiveness,
+                                    ice_attack_effectiveness, fighting_attack_effectiveness, poison_attack_effectiveness,
+                                    ground_attack_effectiveness, fly_attack_effectiveness, psychic_attack_effectiveness,
+                                    bug_attack_effectiveness, rock_attack_effectiveness, ghost_attack_effectiveness,
+                                    dragon_attack_effectiveness, dark_attack_effectiveness, steel_attack_effectiveness,
+                                    fairy_attack_effectiveness)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37, $38, $39, $40, $41);
+        "#,
+        id.into_bytes(),
+        slug,
+        name,
+        pokedex_id,
+        hp,
+        attack,
+        defense,
+        special_attack,
+        special_defense,
+        speed,
+        height,
+        weight,
+        generation,
+        female_rate.unwrap_or(0.0),
+        genderless,
+        legendary_or_mythical,
+        is_default,
+        forms_switchable,
+        base_experience,
+        capture_rate,
+        base_happiness,
+        primary_color,
+        number_pokemon_with_typing,
+        normal_attack_effectiveness,
+        fire_attack_effectiveness,
+        water_attack_effectiveness,
+        electric_attack_effectiveness,
+        grass_attack_effectiveness,
+        ice_attack_effectiveness,
+        fighting_attack_effectiveness,
+        poison_attack_effectiveness,
+        ground_attack_effectiveness,
+        fly_attack_effectiveness,
+        psychic_attack_effectiveness,
+        bug_attack_effectiveness,
+        rock_attack_effectiveness,
+        ghost_attack_effectiveness,
+        dragon_attack_effectiveness,
+        dark_attack_effectiveness,
+        steel_attack_effectiveness,
+        fairy_attack_effectiveness,
+    )
+    .execute(pool)
+    .await
 }
