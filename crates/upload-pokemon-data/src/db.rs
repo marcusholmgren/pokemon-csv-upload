@@ -1,5 +1,7 @@
+use crate::pokemon_csv::PokemonCsv;
 use std::fmt;
 
+use inflector::Inflector;
 use ksuid::Ksuid;
 
 #[derive(Debug)]
@@ -64,5 +66,53 @@ impl fmt::Debug for PokemonId {
         f.debug_tuple("PokemonId")
             .field(&self.0.to_base62())
             .finish()
+    }
+}
+
+impl From<PokemonCsv> for PokemonTableRow {
+    fn from(csv: PokemonCsv) -> Self {
+        PokemonTableRow {
+            id: PokemonId::new(),
+            slug: csv.name.to_kebab_case(),
+            name: csv.name,
+            pokedex_id: csv.pokedex_id,
+            hp: csv.hp.into(),
+            attack: csv.attack.into(),
+            defense: csv.defense.into(),
+            special_attack: csv.special_attack.into(),
+            special_defense: csv.special_defense.into(),
+            speed: csv.speed.into(),
+            height: csv.height,
+            weight: csv.weight,
+            generation: csv.generation.into(),
+            female_rate: csv.female_rate,
+            genderless: csv.genderless,
+            legendary_or_mythical: csv.is_legendary_or_mythical,
+            is_default: csv.is_default,
+            forms_switchable: csv.forms_switchable,
+            base_experience: csv.base_experience.into(),
+            capture_rate: csv.capture_rate.into(),
+            base_happiness: csv.base_happiness.into(),
+            primary_color: csv.primary_color,
+            number_pokemon_with_typing: csv.number_pokemon_with_typing,
+            normal_attack_effectiveness: csv.normal_attack_effectiveness,
+            fire_attack_effectiveness: csv.fire_attack_effectiveness,
+            water_attack_effectiveness: csv.water_attack_effectiveness,
+            electric_attack_effectiveness: csv.electric_attack_effectiveness,
+            grass_attack_effectiveness: csv.grass_attack_effectiveness,
+            ice_attack_effectiveness: csv.ice_attack_effectiveness,
+            fighting_attack_effectiveness: csv.fighting_attack_effectiveness,
+            poison_attack_effectiveness: csv.poison_attack_effectiveness,
+            ground_attack_effectiveness: csv.ground_attack_effectiveness,
+            fly_attack_effectiveness: csv.fly_attack_effectiveness,
+            psychic_attack_effectiveness: csv.psychic_attack_effectiveness,
+            bug_attack_effectiveness: csv.bug_attack_effectiveness,
+            rock_attack_effectiveness: csv.rock_attack_effectiveness,
+            ghost_attack_effectiveness: csv.ghost_attack_effectiveness,
+            dragon_attack_effectiveness: csv.dragon_attack_effectiveness,
+            dark_attack_effectiveness: csv.dark_attack_effectiveness,
+            steel_attack_effectiveness: csv.steel_attack_effectiveness,
+            fairy_attack_effectiveness: csv.fairy_attack_effectiveness,
+        }
     }
 }
