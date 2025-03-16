@@ -1,3 +1,5 @@
+use crate::db::{PokemonId, PokemonTableRow};
+use inflector::Inflector;
 use serde::{Deserialize, de};
 
 #[derive(Debug, Deserialize)]
@@ -55,6 +57,102 @@ pub struct PokemonCsv {
     pub dark_attack_effectiveness: f32,
     pub steel_attack_effectiveness: f32,
     pub fairy_attack_effectiveness: f32,
+}
+
+impl From<PokemonCsv> for PokemonTableRow {
+    fn from(
+        PokemonCsv {
+            name,
+            pokedex_id,
+            abilities: _,
+            typing: _,
+            hp,
+            attack,
+            defense,
+            special_attack,
+            special_defense,
+            speed,
+            height,
+            weight,
+            generation,
+            female_rate,
+            genderless,
+            is_legendary_or_mythical,
+            is_default,
+            forms_switchable,
+            base_experience,
+            capture_rate,
+            egg_groups: _,
+            base_happiness,
+            evolves_from: _,
+            primary_color,
+            number_pokemon_with_typing,
+            normal_attack_effectiveness,
+            fire_attack_effectiveness,
+            water_attack_effectiveness,
+            electric_attack_effectiveness,
+            grass_attack_effectiveness,
+            ice_attack_effectiveness,
+            fighting_attack_effectiveness,
+            poison_attack_effectiveness,
+            ground_attack_effectiveness,
+            fly_attack_effectiveness,
+            psychic_attack_effectiveness,
+            bug_attack_effectiveness,
+            rock_attack_effectiveness,
+            ghost_attack_effectiveness,
+            dragon_attack_effectiveness,
+            dark_attack_effectiveness,
+            steel_attack_effectiveness,
+            fairy_attack_effectiveness,
+        }: PokemonCsv,
+    ) -> Self {
+        let id = PokemonId::new();
+        let slug = name.to_kebab_case();
+        PokemonTableRow {
+            id,
+            slug,
+            name,
+            pokedex_id: pokedex_id as i16,
+            hp: hp.into(),
+            attack: attack.into(),
+            defense: defense.into(),
+            special_attack: special_attack.into(),
+            special_defense: special_defense.into(),
+            speed: speed.into(),
+            height: height as i16,
+            weight: weight as i16,
+            generation: generation.into(),
+            female_rate,
+            genderless,
+            legendary_or_mythical: is_legendary_or_mythical,
+            is_default,
+            forms_switchable,
+            base_experience: base_experience as i16,
+            capture_rate: capture_rate.into(),
+            base_happiness: base_happiness.into(),
+            primary_color,
+            number_pokemon_with_typing,
+            normal_attack_effectiveness,
+            fire_attack_effectiveness,
+            water_attack_effectiveness,
+            electric_attack_effectiveness,
+            grass_attack_effectiveness,
+            ice_attack_effectiveness,
+            fighting_attack_effectiveness,
+            poison_attack_effectiveness,
+            ground_attack_effectiveness,
+            fly_attack_effectiveness,
+            psychic_attack_effectiveness,
+            bug_attack_effectiveness,
+            rock_attack_effectiveness,
+            ghost_attack_effectiveness,
+            dragon_attack_effectiveness,
+            dark_attack_effectiveness,
+            steel_attack_effectiveness,
+            fairy_attack_effectiveness,
+        }
+    }
 }
 
 fn from_capital_bool<'de, D>(deserializer: D) -> Result<bool, D::Error>
