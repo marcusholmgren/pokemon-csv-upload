@@ -1,4 +1,4 @@
-# pokemon service with a Postgres database that exposes the default port 5432
+# Pokémon service with a Postgres database that exposes the default port 5432
 
 services:
   db:
