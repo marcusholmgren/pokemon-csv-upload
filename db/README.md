@@ -1,4 +1,4 @@
-# Pokemon database schema
+# Pokémon database schema
 
 The `schema.sql` file contains the schema for the Pokemon database.
 There are 5 tables in the database:
@@ -38,7 +38,7 @@ classDiagram
 
 ## Analytical queries
 
-What evelutions are there for each pokemon?
+What evelutions are there for each pokémon?
 
 ```sql
 SELECT
