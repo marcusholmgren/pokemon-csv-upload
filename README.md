@@ -2,6 +2,8 @@
 
 This is a project to read a CSV file and upload it to a database.
 
+The schema for this project can viewed in the [database README](./db/README.md)
+
 ## Features
 
 - Read Pokemon CSV files

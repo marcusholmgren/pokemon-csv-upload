@@ -177,3 +177,75 @@ pub async fn insert_pokemon(
     .execute(pool)
     .await
 }
+
+pub async fn insert_abilities(
+    pool: &PgPool,
+    pokemon_id: &PokemonId,
+    ability: &String,
+) -> Result<sqlx::postgres::PgQueryResult, sqlx::Error> {
+    sqlx::query!(
+        r#"
+        insert into abilities (id, pokemon_id, ability)
+        VALUES ($1, $2, $3)
+        "#,
+        PokemonId::new().into_bytes(),
+        pokemon_id.into_bytes(),
+        ability,
+    )
+    .execute(pool)
+    .await
+}
+
+pub async fn insert_egg_groups(
+    pool: &PgPool,
+    pokemon_id: &PokemonId,
+    egg_group: &String,
+) -> Result<sqlx::postgres::PgQueryResult, sqlx::Error> {
+    sqlx::query!(
+        r#"
+        insert into egg_groups (id, pokemon_id, egg_group)
+        VALUES ($1, $2, $3)
+        "#,
+        PokemonId::new().into_bytes(),
+        pokemon_id.into_bytes(),
+        egg_group,
+    )
+    .execute(pool)
+    .await
+}
+
+pub async fn insert_typing(
+    pool: &PgPool,
+    pokemon_id: &PokemonId,
+    typing: &String,
+) -> Result<sqlx::postgres::PgQueryResult, sqlx::Error> {
+    sqlx::query!(
+        r#"
+        insert into typing (id, pokemon_id, typing)
+        VALUES ($1, $2, $3)
+        "#,
+        PokemonId::new().into_bytes(),
+        pokemon_id.into_bytes(),
+        typing,
+    )
+    .execute(pool)
+    .await
+}
+
+pub async fn insert_evolutions(
+    pool: &PgPool,
+    pokemon_id: &PokemonId,
+    evolves_from: &PokemonId,
+) -> Result<sqlx::postgres::PgQueryResult, sqlx::Error> {
+    sqlx::query!(
+        r#"
+        insert into evolutions (id, pokemon_id, evolves_from)
+        VALUES ($1, $2, $3)
+        "#,
+        PokemonId::new().into_bytes(),
+        pokemon_id.into_bytes(),
+        evolves_from.into_bytes(),
+    )
+    .execute(pool)
+    .await
+}

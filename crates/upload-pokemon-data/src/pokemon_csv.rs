@@ -2,7 +2,7 @@ use crate::db::{PokemonId, PokemonTableRow};
 use inflector::Inflector;
 use serde::{Deserialize, de};
 
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct PokemonCsv {
     pub name: String,
     pub pokedex_id: u16,

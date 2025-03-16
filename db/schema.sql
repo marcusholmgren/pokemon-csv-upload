@@ -49,3 +49,35 @@ CREATE TABLE IF NOT EXISTS pokemon (
     PRIMARY KEY (id),
     UNIQUE (slug)
 );
+
+CREATE TABLE IF NOT EXISTS abilities (
+    id BYTEA NOT NULL, -- PostgreSQL uses BYTEA for VARBINARY
+    pokemon_id BYTEA NOT NULL,
+    ability VARCHAR(16) NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (pokemon_id) REFERENCES pokemon (id)
+);
+
+CREATE TABLE IF NOT EXISTS typing (
+    id BYTEA NOT NULL,
+    pokemon_id BYTEA NOT NULL,
+    typing VARCHAR(8) NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (pokemon_id) REFERENCES pokemon (id)
+);
+
+CREATE TABLE IF NOT EXISTS egg_groups (
+    id BYTEA NOT NULL,
+    pokemon_id BYTEA NOT NULL,
+    egg_group VARCHAR(13) NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (pokemon_id) REFERENCES pokemon (id)
+);
+
+CREATE TABLE IF NOT EXISTS evolutions (
+    id BYTEA NOT NULL,
+    pokemon_id BYTEA NOT NULL,
+    evolves_from BYTEA NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (pokemon_id) REFERENCES pokemon (id)
+);
