@@ -34,3 +34,23 @@ classDiagram
    evolutions  -->  pokemon : pokemon_id
    typing  -->  pokemon : pokemon_id
 ```
+
+
+## Analytical queries
+
+What evelutions are there for each pokemon?
+
+```sql
+SELECT
+    b.name AS pokemon,
+    string_agg(a.name, ', ') AS evolves_into
+FROM
+    evolutions
+LEFT JOIN
+    pokemon a ON a.id = evolutions.pokemon_id
+LEFT JOIN
+    pokemon b ON b.id = evolutions.evolves_from
+GROUP BY
+    b.name
+order by count(b.name) desc;
+```
